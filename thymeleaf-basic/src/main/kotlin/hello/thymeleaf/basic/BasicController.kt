@@ -79,6 +79,11 @@ class BasicController {
         return "basic/operation"
     }
 
+    @GetMapping("/attribute")
+    fun attribute(): String {
+        return "basic/attribute"
+    }
+
     data class User(
         val username: String,
         val age: Int
