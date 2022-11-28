@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component
 import javax.annotation.PostConstruct
 
 @Component
-class TestDataInit {
-    private lateinit var itemRepository: ItemRepository
-
+class TestDataInit(
+    private val itemRepository: ItemRepository
+) {
     /**
      * 테스트용 데이터 추가
      */
