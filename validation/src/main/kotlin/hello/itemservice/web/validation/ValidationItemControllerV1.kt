@@ -9,19 +9,19 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
 @RequestMapping("/validation/v1/items")
-class ValidationItemControllerV1 {
-    private val itemRepository: ItemRepository? = null
-
+class ValidationItemControllerV1(
+    private val itemRepository: ItemRepository
+) {
     @GetMapping
     fun items(model: Model): String {
-        val items = itemRepository!!.findAll()
+        val items = itemRepository.findAll()
         model.addAttribute("items", items)
         return "validation/v1/items"
     }
 
     @GetMapping("/{itemId}")
     fun item(@PathVariable itemId: Long, model: Model): String {
-        val item = itemRepository!!.findById(itemId)
+        val item = itemRepository.findById(itemId)
         model.addAttribute("item", item)
         return "validation/v1/item"
     }
@@ -34,7 +34,7 @@ class ValidationItemControllerV1 {
 
     @PostMapping("/add")
     fun addItem(@ModelAttribute item: Item, redirectAttributes: RedirectAttributes): String {
-        val savedItem = itemRepository!!.save(item)
+        val savedItem = itemRepository.save(item)
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
         return "redirect:/validation/v1/items/{itemId}"
@@ -42,14 +42,14 @@ class ValidationItemControllerV1 {
 
     @GetMapping("/{itemId}/edit")
     fun editForm(@PathVariable itemId: Long, model: Model): String {
-        val item = itemRepository!!.findById(itemId)
+        val item = itemRepository.findById(itemId)
         model.addAttribute("item", item)
         return "validation/v1/editForm"
     }
 
     @PostMapping("/{itemId}/edit")
     fun edit(@PathVariable itemId: Long, @ModelAttribute item: Item): String {
-        itemRepository!!.update(itemId, item)
+        itemRepository.update(itemId, item)
         return "redirect:/validation/v1/items/{itemId}"
     }
 }
