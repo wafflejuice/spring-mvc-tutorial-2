@@ -155,7 +155,7 @@ class ValidationItemControllerV2(
         return "redirect:/validation/v2/items/{itemId}"
     }
 
-    @PostMapping("/add")
+    //@PostMapping("/add")
     fun addItemV3(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
@@ -217,6 +217,47 @@ class ValidationItemControllerV2(
                         null
                     )
                 )
+            }
+        }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            return "validation/v2/addForm"
+        }
+
+        // 성공 로직
+
+        val savedItem = itemRepository.save(item)
+        redirectAttributes.addAttribute("itemId", savedItem.id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+
+    @PostMapping("/add")
+    fun addItemV4(
+        @ModelAttribute item: Item,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
+
+        // 검증 로직
+        if (StringUtils.hasText(item.itemName).not()) {
+            bindingResult.rejectValue("itemName", "required")
+        }
+        if (item.price == null || item.price!! < 1000 || item.price!! > 1_000_000) {
+            bindingResult.rejectValue("price", "range", arrayOf(1000, 1000000), null)
+        }
+        if (item.quantity == null || item.quantity!! >= 9999) {
+            bindingResult.rejectValue("quantity", "max", arrayOf(9999), null)
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10000) {
+                bindingResult.reject("totalPriceMin", arrayOf(10000, resultPrice), null)
             }
         }
 
