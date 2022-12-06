@@ -15,7 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 @Controller
 @RequestMapping("/validation/v2/items")
 class ValidationItemControllerV2(
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val itemValidator: ItemValidator
 ) {
     @GetMapping
     fun items(model: Model): String {
@@ -235,7 +236,7 @@ class ValidationItemControllerV2(
     }
 
 
-    @PostMapping("/add")
+    //    @PostMapping("/add")
     fun addItemV4(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
@@ -263,6 +264,29 @@ class ValidationItemControllerV2(
                 bindingResult.reject("totalPriceMin", arrayOf(10000, resultPrice), null)
             }
         }
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            return "validation/v2/addForm"
+        }
+
+        // 성공 로직
+
+        val savedItem = itemRepository.save(item)
+        redirectAttributes.addAttribute("itemId", savedItem.id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV5(
+        @ModelAttribute item: Item,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
+
+        itemValidator.validate(item, bindingResult)
 
         // 검증에 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
