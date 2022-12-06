@@ -5,10 +5,8 @@ import hello.itemservice.domain.item.ItemRepository
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.util.StringUtils
-import org.springframework.validation.BindingResult
-import org.springframework.validation.FieldError
-import org.springframework.validation.ObjectError
-import org.springframework.validation.ValidationUtils
+import org.springframework.validation.*
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
@@ -18,6 +16,11 @@ class ValidationItemControllerV2(
     private val itemRepository: ItemRepository,
     private val itemValidator: ItemValidator
 ) {
+    @InitBinder
+    fun init(dataBinder: DataBinder) {
+        dataBinder.addValidators(itemValidator)
+    }
+
     @GetMapping
     fun items(model: Model): String {
         val items = itemRepository.findAll()
@@ -278,7 +281,7 @@ class ValidationItemControllerV2(
         return "redirect:/validation/v2/items/{itemId}"
     }
 
-    @PostMapping("/add")
+    //    @PostMapping("/add")
     fun addItemV5(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
@@ -287,6 +290,28 @@ class ValidationItemControllerV2(
     ): String {
 
         itemValidator.validate(item, bindingResult)
+
+        // 검증에 실패하면 다시 입력 폼으로
+        if (bindingResult.hasErrors()) {
+            return "validation/v2/addForm"
+        }
+
+        // 성공 로직
+
+        val savedItem = itemRepository.save(item)
+        redirectAttributes.addAttribute("itemId", savedItem.id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+
+    @PostMapping("/add")
+    fun addItemV6(
+        @Validated @ModelAttribute item: Item,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
 
         // 검증에 실패하면 다시 입력 폼으로
         if (bindingResult.hasErrors()) {
