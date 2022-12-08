@@ -38,8 +38,7 @@ class ValidationItemControllerV3(
     fun addItem(
         @Validated @ModelAttribute item: Item,
         bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
 
         // 검증에 실패하면 다시 입력 폼으로
