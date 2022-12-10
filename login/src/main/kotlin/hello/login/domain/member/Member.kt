@@ -6,11 +6,11 @@ data class Member(
     var id: Long = 0L,
 
     @field:NotEmpty
-    val loginId: String?,
+    val loginId: String? = null,
 
     @field:NotEmpty
-    val name: String?,
+    val name: String? = null,
 
     @field:NotEmpty
-    val password: String?
+    val password: String? = null
 )
