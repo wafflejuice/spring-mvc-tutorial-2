@@ -8,18 +8,22 @@ import org.springframework.mock.web.MockHttpServletResponse
 
 class SessionManagerTest {
 
-    val sessionMamager = SessionManager()
+    private val sessionManager = SessionManager()
 
     @Test
     fun sessionTest() {
         val response = MockHttpServletResponse()
         val member = Member()
-        sessionMamager.createSession(member, response)
+        sessionManager.createSession(member, response)
 
         val request = MockHttpServletRequest()
         request.setCookies(*response.cookies)
 
-        val result = sessionMamager.getSession(request)
+        val result = sessionManager.getSession(request)
         Assertions.assertThat(result).isEqualTo(member)
+
+        sessionManager.expire(request)
+        val expired = sessionManager.getSession(request)
+        Assertions.assertThat(expired).isNull()
     }
 }
