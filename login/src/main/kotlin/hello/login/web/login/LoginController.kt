@@ -2,6 +2,7 @@ package hello.login.web.login
 
 import hello.login.domain.login.LoginService
 import hello.login.web.session.SessionManager
+import hello.login.web.session.SessionType
 import org.springframework.stereotype.Controller
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
@@ -52,7 +53,7 @@ class LoginController(
         return "redirect:/"
     }
 
-    @PostMapping("/login")
+    //    @PostMapping("/login")
     fun loginV2(
         @Valid @ModelAttribute("loginForm") form: LoginForm,
         bindingResult: BindingResult,
@@ -77,15 +78,47 @@ class LoginController(
         return "redirect:/"
     }
 
+    @PostMapping("/login")
+    fun loginV3(
+        @Valid @ModelAttribute("loginForm") form: LoginForm,
+        bindingResult: BindingResult,
+        request: HttpServletRequest
+    ): String {
+        if (bindingResult.hasErrors()) {
+            return "login/loginForm"
+        }
+
+        val loginMember = loginService.login(form.loginId!!, form.password!!)
+
+        if (loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.")
+            return "login/loginForm"
+        }
+
+        // 로그인 성공 처리
+
+        // 세션이 있으면 반환, 없으면 신규 세션을 반환
+        // 세션에 로그인 회원 정보 보관
+        request.session?.setAttribute(SessionType.LOGIN_MEMBER.value, loginMember)
+
+        return "redirect:/"
+    }
+
     //    @PostMapping("/logout")
     fun logout(response: HttpServletResponse): String {
         extractCookie(response, "memberId")
         return "redirect:/"
     }
 
-    @PostMapping("/logout")
+    //    @PostMapping("/logout")
     fun logoutV2(request: HttpServletRequest): String {
         sessionManager.expire(request)
+        return "redirect:/"
+    }
+
+    @PostMapping("/logout")
+    fun logoutV3(request: HttpServletRequest): String {
+        request.getSession(false)?.invalidate()
         return "redirect:/"
     }
 
