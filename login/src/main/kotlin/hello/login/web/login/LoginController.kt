@@ -1,8 +1,8 @@
 package hello.login.web.login
 
 import hello.login.domain.login.LoginService
+import hello.login.web.session.LOGIN_MEMBER
 import hello.login.web.session.SessionManager
-import hello.login.web.session.SessionType
 import org.springframework.stereotype.Controller
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
@@ -99,7 +99,7 @@ class LoginController(
 
         // 세션이 있으면 반환, 없으면 신규 세션을 반환
         // 세션에 로그인 회원 정보 보관
-        request.session?.setAttribute(SessionType.LOGIN_MEMBER.value, loginMember)
+        request.session.setAttribute(LOGIN_MEMBER, loginMember)
 
         return "redirect:/"
     }

@@ -2,12 +2,13 @@ package hello.login.web
 
 import hello.login.domain.member.Member
 import hello.login.domain.member.MemberRepository
+import hello.login.web.session.LOGIN_MEMBER
 import hello.login.web.session.SessionManager
-import hello.login.web.session.SessionType
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.SessionAttribute
 import javax.servlet.http.HttpServletRequest
 
 @Controller
@@ -48,13 +49,25 @@ class HomeController(
         return "loginHome"
     }
 
-    @GetMapping("/")
+    //    @GetMapping("/")
     fun homeLoginV3(
         request: HttpServletRequest,
         model: Model
     ): String {
-        val loginMember = request.getSession(false)?.getAttribute(SessionType.LOGIN_MEMBER.value) as Member?
+        val loginMember = request.getSession(false)?.getAttribute(LOGIN_MEMBER) as Member?
             ?: return "home"
+
+        model.addAttribute("member", loginMember)
+
+        return "loginHome"
+    }
+
+    @GetMapping("/")
+    fun homeLoginV3Spring(
+        @SessionAttribute(name = LOGIN_MEMBER, required = false) loginMember: Member?,
+        model: Model
+    ): String {
+        loginMember ?: return "home"
 
         model.addAttribute("member", loginMember)
 
