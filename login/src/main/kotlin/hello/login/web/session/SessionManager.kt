@@ -1,5 +1,6 @@
 package hello.login.web.session
 
+import org.springframework.stereotype.Component
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import javax.servlet.http.Cookie
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletResponse
 
 private const val SESSION_COOKIE_NAME = "mySessionId"
 
+@Component
 class SessionManager(
     private val sessionStore: MutableMap<String, Any> = ConcurrentHashMap()
 ) {
@@ -22,7 +24,7 @@ class SessionManager(
     fun getSession(request: HttpServletRequest): Any? {
         val sessionCookie = findCookie(request, SESSION_COOKIE_NAME)
             ?: return null
-        
+
         return sessionStore[sessionCookie.value]
     }
 
@@ -34,5 +36,5 @@ class SessionManager(
     }
 
     private fun findCookie(request: HttpServletRequest, cookieName: String) =
-        request.cookies.find { it.name == cookieName }
+        request.cookies?.find { it.name == cookieName }
 }
