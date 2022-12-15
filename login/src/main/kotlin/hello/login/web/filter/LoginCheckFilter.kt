@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse
 class LoginCheckFilter : Filter {
     private val logger = LoggerFactory.getLogger(LogFilter::class.java)
 
-    private val whitelist = arrayOf("/", "members/add", "/login", "/logout", "/css/*")
+    private val whitelist = arrayOf("/", "/members/add", "/login", "/logout", "/css/*")
 
     override fun doFilter(request: ServletRequest?, response: ServletResponse?, chain: FilterChain?) {
         val httpRequest = request as HttpServletRequest
