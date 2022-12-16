@@ -2,6 +2,7 @@ package hello.login.web
 
 import hello.login.domain.member.Member
 import hello.login.domain.member.MemberRepository
+import hello.login.web.argumentresolver.Login
 import hello.login.web.session.LOGIN_MEMBER
 import hello.login.web.session.SessionManager
 import org.springframework.stereotype.Controller
@@ -62,9 +63,21 @@ class HomeController(
         return "loginHome"
     }
 
-    @GetMapping("/")
+    //    @GetMapping("/")
     fun homeLoginV3Spring(
         @SessionAttribute(name = LOGIN_MEMBER, required = false) loginMember: Member?,
+        model: Model
+    ): String {
+        loginMember ?: return "home"
+
+        model.addAttribute("member", loginMember)
+
+        return "loginHome"
+    }
+
+    @GetMapping("/")
+    fun homeLoginV3ArgumentResolver(
+        @Login loginMember: Member?,
         model: Model
     ): String {
         loginMember ?: return "home"
